@@ -9,48 +9,120 @@ let submitLoginInfo = document.getElementById("submitLoginInfo")
 let submitStoreName = document.getElementById("submitStoreName")
 let storeName = document.getElementById("storeName")
 //-----------------------------------------------------------
+let grocery = document.getElementById("grocery")
 let groceryList = document.getElementById("groceryList")
+var currentUser = null
 
 const database = firebase.database();
 
-const categoriesRef = database.ref("groceryStore")
+const categoriesRef = database.ref("stores")
+
 
 let categories = []
 
 function displayGroceryItems() {
-
+  console.log(categories);
+  grocery.innerHTML = ""
   let liGroceryItems = categories.map(function(category) {
+    function renderItems(){
+
+      var renderedItemsArray = []
+      for(var i in category.items){
+        var theItemObj = category.items[i]
+        var theItemName = theItemObj.item
+        renderedItemsArray.push(`<p>${theItemName}<button>delete</button></p>`)
+
+      }
+
+      return renderedItemsArray.join('')
+    }
+    //let store = storeName.value
+
     return `
   <li>
-  <h3>${category.store}<h3>
-  <input type="text" placeholder = "Enter grocery item" />
-  <button onclick="addGroceries(this,'${category.store}')">Save Grocery Item</button>
+    <h3>${category.name}<h3>
+    <input store="${category.name}" id="list_${category.name}" type="text" placeholder = "Enter grocery item" />
+    <button onclick="addGroceries(this,'${category.name}', 'list_${category.name}')">Save Grocery Item</button>
+    ${renderItems()}
   </li>`
   })
 
-  groceryList.innerHTML = liGroceryItems.join('')
+  //let list = groceryList.value
+  grocery.innerHTML = liGroceryItems.join('')
 }
 
+submitStoreName.addEventListener('click', function() {
 
-function addGroceries(title){
+  let store = storeName.value
 
-  submitStoreName.addEventListener('click', function() {
-
-    let store = storeName.value
-
-    let storeItems = categoriesRef.child(title).child("list").storeItems.child(storeName).set({
-      store: storeName
-    })
-    console.log("Hello Hello ")
-
+  categoriesRef.child(store).set({
+    name : store,
+    createdBy: currentUser
   })
+
+})
+
+function checkAuth(){
+  firebase.auth().onAuthStateChanged(function(user){
+    if(user){
+
+      currentUser = firebase.auth().currentUser.uid
+    }
+    else{
+
+      currentUser = null
+    }
+
+    observer()
+  })
+}
+
+function observer() {
+
+
+  if(currentUser){
+
+    categoriesRef.on('value',function(display){
+
+      categories = []
+
+      display.forEach(function(childDisplay) {
+
+
+        var storeCreatedBy = childDisplay.val().createdBy
+
+        if(storeCreatedBy === currentUser){
+            categories.push(childDisplay.val())
+
+            for(var i in childDisplay.val() ){
+              console.log(childDisplay.val()[i])
+            }
+        }
+
+      })
+
+      displayGroceryItems()
+
+    })
+
+
+  }
+
+}
+
+function addGroceries(theFormNode, theStore, inputId){
+
+  var storeInput = document.getElementById(inputId)
+  var itemName = storeInput.value
+  var newItemRef = database.ref(`stores/${theStore}`).child("items").push()
+  newItemRef.set({item: itemName})
 
 }
 
 submitLoginInfo.addEventListener('click', function() {
 
   let email = loginEmail.value
-  let password = regPassword.value
+  let password = loginPassword.value
 
   firebase.auth().signInWithEmailAndPassword(email, password)
 
@@ -76,3 +148,12 @@ submitRegisterInfo.addEventListener('click', function() {
     var errorMessage = error.message;
   })
 })
+
+checkAuth()
+observer()
+
+// firebase.auth().signOut().then(function() {
+//   // Sign-out successful.
+// }).catch(function(error) {
+//   // An error happened.
+// });
