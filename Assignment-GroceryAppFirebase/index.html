@@ -1,0 +1,48 @@
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+
+  <div>
+    <h3> Register </h3>
+    <input id="regEmail" type="email" placeholder="Enter Email Address" >
+    <input id="regPassword" type="password" placeholder="Enter Password">
+    <button id="submitRegisterInfo">Submit</button>
+  </div>
+
+  <div>
+    <h3> Login </h3>
+    <input id="loginEmail" type="email" placeholder="Enter Email Address">
+    <input id="loginPassword" type="password" placeholder="Enter Password">
+    <button id="submitLoginInfo">Submit</button>
+  </div>
+
+  <div>
+    <h3> Enter Store Name </h3>
+    <input id="storeName" type="text" placeholder="Enter Store Name">
+    <button id="submitStoreName">Submit</button>
+  </div>
+
+  <div>
+    <ul id="groceryList">
+    </ul>
+  </div>
+
+</body>
+  <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase-auth.js"></script>
+  <script>
+    var config = {
+      apiKey: "AIzaSyDAprlMS-3XUYuG0HGnectrMsAD9A6Z40w",
+      authDomain: "grocery-store-items.firebaseapp.com",
+      databaseURL: "https://grocery-store-items.firebaseio.com",
+      projectId: "grocery-store-items",
+      storageBucket: "grocery-store-items.appspot.com",
+      messagingSenderId: "533932072776"
+    };
+    firebase.initializeApp(config);
+  </script>
+  <script src="GroceryApp.js"></script>
+</html>
